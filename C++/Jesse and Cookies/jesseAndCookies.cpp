@@ -1,94 +1,122 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include<vector>
 
 using namespace std;
 
-string ltrim(const string &);
-string rtrim(const string &);
-vector<string> split(const string &);
-
-/*
- * Complete the 'cookies' function below.
- *
- * The function is expected to return an INTEGER.
- * The function accepts following parameters:
- *  1. INTEGER k
- *  2. INTEGER_ARRAY A
- */
 
 int cookies(int k, vector<int> A) {
+    int a = 1;
+    int N = A.size();
+
+    /*
+     Above code is:
+        to stop if we can't make cookies sweetness greater than required and to
+        return -1
+    */
+
+    int count = 0;
+    int flag;
+    flag = 0;
+    for (int i = 0; i < N; ++i)
+        {
+            if (A[i]<k)
+            {
+                flag++; // count of cookie (sweetness<k)
+            }
+
+        }
+
+        /*
+            Above code is:
+            to count number of cookies less than required sweetness
+        */
+
+    while(a<N){ // if we can't make cookies sweetness greater than required
+
+        int n = A.size(); // size of cookie container (not constant)
+
+        if (flag <= 0){ // if no cookie sweetness is less than k
+            return count;
+        }
+        else{
+
+            int lsc[2],small,pos,newlsc;
+
+            if (n ==2){
+
+                /*
+                This if statement is to avoid segmentation error
+                    - when cookie container size become '2', the elese part code will try to access
+                    third element but there will be only two elment which gives us segmentation error.
+                */
+                if(A[0]>A[1]){
+                    lsc[0] = A[1];
+                    lsc[1] = A[0];
+
+                }
+                else{
+                    lsc[0] = A[0];
+                    lsc[1] = A[1];
+                }
+                A.clear();
+                newlsc = lsc[0] + (2*lsc[1]);
+                count++;
+                A.push_back(newlsc);
+            }
+            else{
+                for (int i = 0; i < 2; ++i)
+                {
+                    small = A[i];
+                    pos = i;
+                    for (int j = i+1; j < n; ++j)
+                    {
+                        if(small>A[j]){
+                            small = A[j];
+                            pos = j;
+                        }
+                    }
+                    lsc[i] = small;
+                    A.erase(A.begin()+pos);
+                    n--;
+                }
+                newlsc = lsc[0] + (2*lsc[1]);
+                count++;
+                A.push_back(newlsc);
+            }
+
+            if(newlsc<=k){ // if new cookie is also less sweet than k
+                flag--;
+            }
+            else{ // if new cookie is also more sweet than k
+
+                flag = flag - 2;
+            }
+        }
+
+        a++;
+    }
+    if(A[0]<k){
+        return -1;
+    }
+    else{
+        return count;
+    }
+
 
 }
 
 int main()
 {
-    ofstream fout(getenv("OUTPUT_PATH"));
+    int n,k,temp;
 
-    string first_multiple_input_temp;
-    getline(cin, first_multiple_input_temp);
+    cin>>n>>k;
+    vector<int> Arr;
 
-    vector<string> first_multiple_input = split(rtrim(first_multiple_input_temp));
-
-    int n = stoi(first_multiple_input[0]);
-
-    int k = stoi(first_multiple_input[1]);
-
-    string A_temp_temp;
-    getline(cin, A_temp_temp);
-
-    vector<string> A_temp = split(rtrim(A_temp_temp));
-
-    vector<int> A(n);
-
-    for (int i = 0; i < n; i++) {
-        int A_item = stoi(A_temp[i]);
-
-        A[i] = A_item;
+    for(int i =0; i<n; i++){
+        cin>>temp;
+        Arr.push_back(temp);
     }
 
-    int result = cookies(k, A);
-
-    fout << result << "\n";
-
-    fout.close();
-
-    return 0;
-}
-
-string ltrim(const string &str) {
-    string s(str);
-
-    s.erase(
-        s.begin(),
-        find_if(s.begin(), s.end(), not1(ptr_fun<int, int>(isspace)))
-    );
-
-    return s;
-}
-
-string rtrim(const string &str) {
-    string s(str);
-
-    s.erase(
-        find_if(s.rbegin(), s.rend(), not1(ptr_fun<int, int>(isspace))).base(),
-        s.end()
-    );
-
-    return s;
-}
-
-vector<string> split(const string &str) {
-    vector<string> tokens;
-
-    string::size_type start = 0;
-    string::size_type end = 0;
-
-    while ((end = str.find(" ", start)) != string::npos) {
-        tokens.push_back(str.substr(start, end - start));
-
-        start = end + 1;
-    }
-
-    tokens.push_back(str.substr(start));
-
-    return tokens;
+    int no_of_operation = cookies(k,Arr);
+    cout<<no_of_operation<<endl;
 }
